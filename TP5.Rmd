@@ -19,12 +19,15 @@ On se propose dans cette section de segmenter les tissus cérébraux en utilisan
 1) Appliquez à l’image « irm1_cut.jpg » une méthode de classification non supervisée pour la segmenter en quatre régions. A chaque pixel de l’image sera attribuée une nouvelle étiquette selon la région à laquelle il appartient. L’image d’étiquettes finale sera sauvegardée sous le nom « segmentation_methode.jpg ». Où « methode » désigne le nom de la méthode que vous avez utilisée. Par exemple le résultat de la segmentation avec kmeans sera appelé « segmentation_kmeans.jpg ».
 
 ```{python}
-# csfMask = cv2.imread('data/csf_mask.jpg', 0)
+import numpy as np
+import cv2
+from matplotlib import pyplot as plt
 RMI     = cv2.imread('data/irm1_cut.jpg', 0)
 ```
 
 
 ```{r}
+library(tidyverse)
 k_means = l = kmeans(as.vector(t(py$RMI)), 4, iter.max = 1000)
 RMI_Kmeans_segmented = data.frame(
   x = rep(1:dim(py$RMI)[1], each = dim(py$RMI)[2]),

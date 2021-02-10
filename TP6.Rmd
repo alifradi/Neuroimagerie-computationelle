@@ -1,0 +1,65 @@
+---
+title: "05_Segmentation d'images cérébrales"
+author: "Ali FRADY"
+date: "22/01/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r set environment, include=FALSE}
+library(reticulate)
+use_condaenv()
+```
+
+
+Validation de la segmentation
+Cette section vise à introduire quelques critères de validation utilisés en traitement d’images pour évaluer les performances d’une méthode de segmentation d’images. Les masques « csf_mask.jpg », « wm_mask.jpg » et « gm_mask.jpg » calculés à la section III) correspondent à la vérité terrain pour les régions csf, wm et gm que l’on cherche à segmenter. En vous servant de cette vérité terrain ainsi que des masques que vous avez obtenus par votre méthode de classification :
+
+1) Calculez le coefficient de DICE pour chaque région d’intérêt.
+
+```{python}
+import numpy as np
+import cv2
+from matplotlib import pyplot as plt
+wm_mask      = cv2.imread('data/wm_mask.jpg',0)
+WhiteMatter  = cv2.imread('data/WhiteMatter.jpg',0)
+WhiteMatter  = cv2.resize(WhiteMatter, (wm_mask.shape[1],wm_mask.shape[0]))
+gm_mask    = cv2.imread('data/gm_mask.jpg',0)
+GrayMatter = cv2.imread('data/GrayMatter.jpg',0)
+GrayMatter  = cv2.resize(GrayMatter, (gm_mask.shape[1],gm_mask.shape[0]))
+csf_mask      = cv2.imread('data/csf_mask.jpg',0)
+CSFMask       = cv2.imread('data/CSF.jpg',0)
+CSFMask       = cv2.resize(CSFMask, (csf_mask.shape[1], csf_mask.shape[0]))
+
+def dice_coef(img, img2):
+  if img.shape != img2.shape:
+    raise ValueError("Shape mismatch: img and img2 must have to be of the same shape.")
+  else:
+    lenIntersection=0
+    for i in range(img.shape[0]):
+      for j in range(img.shape[1]):
+        if ( img[i][j] != 0 and img2[i][j] != 0 ):
+          lenIntersection+=1
+    lenimg=img.shape[0]*img.shape[1]
+    lenimg2=img2.shape[0]*img2.shape[1]
+    value = (2. * lenIntersection  / (lenimg + lenimg2))
+  return value
+```
+
+```{python}
+dice_coef(wm_mask,    WhiteMatter)
+dice_coef(GrayMatter, gm_mask)
+dice_coef(csf_mask,   CSFMask)
+
+```
+
+2) Calculez pour chaque régions d’intérêt le nombre de faux positifs (FP), faux négatifs (FN), vrai positifs (VP) et vrai négatifs (VN)
+
+
+```{r}
+
+```
+
