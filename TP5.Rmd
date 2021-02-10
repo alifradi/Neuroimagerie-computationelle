@@ -1,0 +1,148 @@
+---
+title: "05_Segmentation d'images cérébrales"
+author: "Ali FRADY"
+date: "22/01/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r set environment, include=FALSE}
+library(reticulate)
+use_condaenv()
+```
+
+On se propose dans cette section de segmenter les tissus cérébraux en utilisant une méthode de classification non supervisée (kmeans, GMM, …).
+
+1) Appliquez à l’image « irm1_cut.jpg » une méthode de classification non supervisée pour la segmenter en quatre régions. A chaque pixel de l’image sera attribuée une nouvelle étiquette selon la région à laquelle il appartient. L’image d’étiquettes finale sera sauvegardée sous le nom « segmentation_methode.jpg ». Où « methode » désigne le nom de la méthode que vous avez utilisée. Par exemple le résultat de la segmentation avec kmeans sera appelé « segmentation_kmeans.jpg ».
+
+```{python}
+# csfMask = cv2.imread('data/csf_mask.jpg', 0)
+RMI     = cv2.imread('data/irm1_cut.jpg', 0)
+```
+
+
+```{r}
+k_means = l = kmeans(as.vector(t(py$RMI)), 4, iter.max = 1000)
+RMI_Kmeans_segmented = data.frame(
+  x = rep(1:dim(py$RMI)[1], each = dim(py$RMI)[2]),
+  y = rep(1:dim(py$RMI)[2], dim(py$RMI)[1]),
+  Inensity  = as.vector(t(py$RMI)),
+  cluster = k_means$cluster
+) %>%
+  mutate(
+    clus1 = ifelse(cluster == 1, 51, 0),
+    clus2 = ifelse(cluster == 2, 81, 0),
+    clus3 = ifelse(cluster == 3, 161, 0),
+    clus4 = ifelse(cluster == 4, 255, 0)
+  )
+
+kmeans_segments =  matrix(RMI_Kmeans_segmented$cluster, nrow = 625)
+
+clus1 = matrix(RMI_Kmeans_segmented$clus1, nrow = 625)
+clus2 = matrix(RMI_Kmeans_segmented$clus2, nrow = 625)
+clus3 = matrix(RMI_Kmeans_segmented$clus3, nrow = 625)
+clus4 = matrix(RMI_Kmeans_segmented$clus4, nrow = 625)
+
+```
+
+```{r}
+library(ggplot2)
+allLevels <- ggplot(data = RMI_Kmeans_segmented, aes(x = y, y = -x)) + 
+  geom_point(colour = factor(RMI_Kmeans_segmented$cluster))+
+      theme_void() + theme(legend.position="none")
+
+allLevels
+```
+
+
+```{r}
+BK <- ggplot(data = RMI_Kmeans_segmented, aes(x = y, y = -x)) + 
+  geom_point(colour = factor(RMI_Kmeans_segmented$clus1))+
+      theme_void() + theme(legend.position="none")
+
+BK
+```
+```{r}
+GM <- ggplot(data = RMI_Kmeans_segmented, aes(x = y, y = -x)) + 
+  geom_point(colour = factor(RMI_Kmeans_segmented$clus2)) +
+      theme_void() + theme(legend.position="none")
+GM
+```
+
+```{r}
+CSF <- ggplot(data = RMI_Kmeans_segmented, aes(x = y, y = -x)) + 
+  geom_point(colour = factor(RMI_Kmeans_segmented$clus3)) +
+      theme_void() + theme(legend.position="none")
+CSF
+```
+
+```{r}
+WM <- ggplot(data = RMI_Kmeans_segmented, aes(x = y, y = -x)) + 
+  geom_point(colour = factor(RMI_Kmeans_segmented$clus4)) +
+      theme_void() + theme(legend.position="none")
+
+WM
+```
+2)	A partir de l’image d’étiquettes que vous avez précédemment crée, générez quatre images de masques contenant les masques de chaque région et sauvegardez les sous le nom « csf_methode.jpg », « gm_methode.jpg », « wm_methode.jpg » et "background.jpg".
+
+```{r}
+jpeg('data/allLevels.jpg')
+allLevels
+dev.off()
+jpeg('data/WhiteMatter.jpg')
+WM
+dev.off()
+jpeg('data/GrayMatter.jpg')
+GM
+dev.off()
+jpeg('data/Background.jpg')
+BK
+dev.off()
+jpeg('data/CSF.jpg')
+CSF
+dev.off()
+```
+
+
+3) Affichez dans une même fenêtre les masques obtenus avec votre méthode de classification ainsi que les masques représentant la vérité terrain : « csf_mask.jpg », « wm_mask.jpg » et « gm_mask.jpg » calculés à la section III)
+
+```{python}
+wm_mask      = cv2.imread('data/wm_mask.jpg')
+WhiteMatter  = cv2.imread('data/WhiteMatter.jpg')
+WhiteMatter  = cv2.resize(WhiteMatter, (wm_mask.shape[1],wm_mask.shape[0]))
+plt.subplot(1, 2, 1)
+plt.imshow(wm_mask),plt.title('wm_mask') 
+plt.subplot(1, 2, 2)
+plt.imshow(WhiteMatter),plt.title('wm_mask_kmeans') 
+plt.show()
+```
+
+
+
+
+```{python}
+gm_mask    = cv2.imread('data/gm_mask.jpg')
+GrayMatter = cv2.imread('data/GrayMatter.jpg')
+GrayMatter  = cv2.resize(GrayMatter, (gm_mask.shape[1],gm_mask.shape[0]))
+plt.subplot(1, 2, 1)
+plt.imshow(gm_mask),plt.title('gm_mask') 
+plt.subplot(1, 2, 2)
+plt.imshow(GrayMatter),plt.title('gm_mask_kmeans') 
+plt.show()
+```
+
+
+```{python}
+csf_mask      = cv2.imread('data/csf_mask.jpg')
+CSFMask       = cv2.imread('data/CSF.jpg')
+CSFMask       = cv2.resize(CSFMask, (csf_mask.shape[1], csf_mask.shape[0]))
+plt.subplot(1, 2, 1)
+plt.imshow(csf_mask),plt.title('csf_mask') 
+plt.subplot(1, 2, 2)
+plt.imshow(CSFMask),plt.title('CSFMask_kmeans') 
+plt.show()
+```
+
