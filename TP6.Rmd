@@ -24,15 +24,22 @@ Cette section vise à introduire quelques critères de validation utilisés en t
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
-wm_mask      = cv2.imread('data/wm_mask.jpg',0)
-WhiteMatter  = cv2.imread('data/WhiteMatter.jpg',0)
+def binarizing_mask(img):
+    _, th = cv2.threshold(img, 10 , 255, cv2.THRESH_BINARY)
+    return th
+    
+wm_mask      = cv2.imread('data/wm_mask.jpg')
+WhiteMatter  = cv2.imread('data/WhiteMatter.jpg')
 WhiteMatter  = cv2.resize(WhiteMatter, (wm_mask.shape[1],wm_mask.shape[0]))
-gm_mask    = cv2.imread('data/gm_mask.jpg',0)
-GrayMatter = cv2.imread('data/GrayMatter.jpg',0)
+
+gm_mask    = cv2.imread('data/gm_mask.jpg')
+GrayMatter = cv2.imread('data/GrayMatter.jpg')
 GrayMatter  = cv2.resize(GrayMatter, (gm_mask.shape[1],gm_mask.shape[0]))
-csf_mask      = cv2.imread('data/csf_mask.jpg',0)
-CSFMask       = cv2.imread('data/CSF.jpg',0)
+
+csf_mask      = cv2.imread('data/csf_mask.jpg')
+CSFMask       = cv2.imread('data/CSF.jpg')
 CSFMask       = cv2.resize(CSFMask, (csf_mask.shape[1], csf_mask.shape[0]))
+
 
 def dice_coef(img, img2):
   if img.shape != img2.shape:
@@ -50,16 +57,54 @@ def dice_coef(img, img2):
 ```
 
 ```{python}
-dice_coef(wm_mask,    WhiteMatter)
-dice_coef(GrayMatter, gm_mask)
-dice_coef(csf_mask,   CSFMask)
+dice_coef(wm_mask,    WhiteMatter) *100
+dice_coef(GrayMatter, gm_mask)*100
+dice_coef(csf_mask,   CSFMask)*100
 
 ```
+```{python}
+plt.subplot(1, 2, 1)
+plt.imshow(wm_mask),plt.title('wm_mask') 
+plt.subplot(1, 2, 2)
+plt.imshow(WhiteMatter),plt.title('wm_mask_kmeans') 
+plt.show()
+
+
+plt.subplot(1, 2, 1)
+plt.imshow(gm_mask),plt.title('gm_mask') 
+plt.subplot(1, 2, 2)
+plt.imshow(GrayMatter),plt.title('gm_mask_kmeans') 
+plt.show()
+
+
+plt.subplot(1, 2, 1)
+plt.imshow(csf_mask),plt.title('csf_mask') 
+plt.subplot(1, 2, 2)
+plt.imshow(CSFMask),plt.title('CSFMask_kmeans') 
+plt.show()
+```
+
+
+
 
 2) Calculez pour chaque régions d’intérêt le nombre de faux positifs (FP), faux négatifs (FN), vrai positifs (VP) et vrai négatifs (VN)
 
 
-```{r}
 
+
+
+
+```{r}
+ActualwhiteMatter = as.vector(py$wm_mask)
+PredictedWhite    = as.vector(py$WhiteMatter)
+
+ActualGrayeMatter = as.vector(py$gm_mask)
+PredictedGray     = as.vector(py$GrayMatter)
+
+ActualwhiteMatter = as.vector(py$csf_mask)
+PredictedCSF      = as.vector(py$CSFMask)
+
+
+dataConfusion = data.frame()
 ```
 

@@ -48,7 +48,7 @@ clus1 = matrix(RMI_Kmeans_segmented$clus1, nrow = 625)
 clus2 = matrix(RMI_Kmeans_segmented$clus2, nrow = 625)
 clus3 = matrix(RMI_Kmeans_segmented$clus3, nrow = 625)
 clus4 = matrix(RMI_Kmeans_segmented$clus4, nrow = 625)
-
+load("10fev.RData")
 ```
 
 ```{r}
@@ -91,7 +91,7 @@ WM
 ```
 2)	A partir de l’image d’étiquettes que vous avez précédemment crée, générez quatre images de masques contenant les masques de chaque région et sauvegardez les sous le nom « csf_methode.jpg », « gm_methode.jpg », « wm_methode.jpg » et "background.jpg".
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 jpeg('data/allLevels.jpg')
 allLevels
 dev.off()
