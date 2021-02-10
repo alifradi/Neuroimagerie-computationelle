@@ -1,0 +1,129 @@
+---
+title: "04_segmentation_seuillage_vetudiant"
+author: "Ali FRADY"
+date: "22/01/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r set environment, include=FALSE}
+library(reticulate)
+use_condaenv()
+```
+
+Segmentation d'images cérébrales
+
+Segmentation d'images par seuillage
+Dans cette section, il s’agit de partitionner le cerveau en 4 régions d’intérêt en utilisant une technique de seuillage simple :
+
+Le fond (étiquette associée = 0)
+Le liquide cérébrospinal (étiquette associée =50)
+La substance grise (étiquette associée =150)
+La substance blanche (étiquette associée = 200)
+
+1) Calculez l’histogramme de l’image « irm1_cut.jpg » et affichez-le avec la librairie matplotlib.
+
+```{python}
+from matplotlib import pyplot as plt
+import numpy as np
+import cv2
+irm1_cut = cv2.imread('data/irm1_cut.jpg', 0)
+plt.hist(irm1_cut.ravel(), 256, [0,256]), plt.title("histogramme de l image irm1_cut.jpg") 
+plt.show()
+```
+
+2) A partir de l’histogramme de l’image définissez visuellement un seuil inférieur et un seuil supérieur d’appartenance à chaque région d’intérêt. Pour cela vous considérerez que chaque gaussienne forme une classe.
+
+```{python}
+BK  = range(0, 25)
+CFS = range(26, 90)
+GM  = range(91, 170)
+WM  = range(171, 256)
+```
+
+3) Créez une nouvelle image d’étiquettes de même taille que l’image « irm1.jpg »
+
+```{python}
+img_etiquette = np.empty_like(irm1_cut)
+```
+
+4) A l’aide d’une boucle 'for' parcourez l’image d’origine et remplissez chaque pixel de l’image d’étiquettes avec l’étiquette qui lui correspond. Par exemple, un pixel qui se trouve entre 0 (seuil inférieur pour le fond) et 25 (seuil supérieur pour le fond) aura comme étiquette 0 (l’étiquette du fond).
+
+
+
+```{python}
+for i in range(img_etiquette.shape[0]):
+  for j in range(img_etiquette.shape[1]):
+    if (irm1_cut[i, j] in CFS):
+      img_etiquette[i, j] = 26
+    elif (irm1_cut[i, j] in GM):
+      img_etiquette[i, j] = 91
+    elif (irm1_cut[i, j] in WM):
+      img_etiquette[i, j] = 171
+    else:
+      img_etiquette[i, j] = 0
+```
+
+
+5) Affichez l’image d’étiquettes.
+
+
+
+```{python}
+img_etiquette
+```
+
+
+6) Enregistrez l’image d’étiquettes sous le nom « segmentation_seuillage.jpg ».
+
+```{python}
+cv2.imwrite('data/segmentation_seuillage.jpg', img_etiquette)
+```
+
+
+7) Effectuez toutes ces opérations avec l’image « irm3_cut.jpg ». Que remarquez-vous ?
+```{python}
+irm3_cut = cv2.imread('data/irm3_cut.jpg', 0)
+plt.hist(irm3_cut.ravel(), 256, [0,256]), plt.title("histogramme de l image irm3_cut.jpg") 
+plt.show()
+```
+
+
+
+```{python}
+S1  = range(0, 50)
+S2 = range(51, 80)
+S3  = range(81, 160)
+S4  = range(161, 256)
+```
+
+
+
+
+```{python}
+img_etiquette3 = np.empty_like(irm3_cut)
+```
+
+
+
+
+```{python}
+for i in range(img_etiquette3.shape[0]):
+  for j in range(img_etiquette3.shape[1]):
+    if (irm3_cut[i, j] in S1):
+      img_etiquette3[i, j] = 0
+    elif (irm3_cut[i, j] in S2):
+      img_etiquette3[i, j] = 51
+    elif (irm3_cut[i, j] in S3):
+      img_etiquette3[i, j] = 81
+    else:
+      img_etiquette3[i, j] = 161
+```
+
+
+```{python}
+cv2.imwrite('data/segmentation_seuillage3.jpg', img_etiquette3)
+```

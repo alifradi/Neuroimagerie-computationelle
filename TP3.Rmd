@@ -1,0 +1,143 @@
+---
+title: "03_histogrammes_masques_vetudiant"
+author: "Ali Frady"
+date: "1/21/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r set environment, include=FALSE}
+library(reticulate)
+use_condaenv()
+```
+
+Segmentation d'images cérébrales
+Histogrammes et masques
+
+Avec la librairie opencv, calculez l’histogramme de l’image « irm1_cut.jpg » et affichez-le avec la librairie matplotlib.
+
+```{python}
+from matplotlib import pyplot as plt
+import cv2
+irm1_cut = cv2.imread('data/irm1_cut.jpg',0)
+# irm1_cut = cv2.cvtColor(irm1_cut, cv2.COLOR_RGB2GRAY)
+plt.imshow(irm1_cut),plt.title('irm1_cut') 
+plt.show()
+```
+
+
+
+```{python echo=TRUE}
+plt.hist(irm1_cut.ravel(), 256, [0,256]), plt.title("histogramme de l image irm1_cut.jpg") 
+plt.show()
+x = irm1_cut.ravel()
+```
+Avec la librairie numpy, calculez l’histogramme de l’image « irm1_cut.jpg » et affichez-le avec la librairie matplotlib.
+
+```{python}
+import numpy as np
+histogram, bin_edges = np.histogram(irm1_cut, bins = 256, range = (0, 256))
+
+plt.plot(bin_edges[0:-1], histogram)
+plt.show()
+```
+
+
+
+Avec la librairie opencv, affichez l’histogramme à l’intérieur de chaque tissu cérébral. Vous utiliserez pour cela l’image « irm1_cut.jpg » et le masque de la région d’intérêt.
+
+
+
+```{python}
+mask = cv2.imread('data/wm_cut.jpg', 0)
+mask_r = cv2.resize(mask, (irm1_cut.shape[1], irm1_cut.shape[0]))
+And = cv2.bitwise_and(irm1_cut, mask_r)
+plt.hist(And.ravel(), 256, [0, 256]); plt.show()
+wm = And.ravel()
+```
+```{r}
+library(plotly)
+library(ggplot2)
+ggplotly(
+  ggplot(data.frame(grayLevels = as.numeric(py$wm))) +
+    geom_density(aes(x = grayLevels)) +
+    labs(title = 'wm_cut')
+)
+```
+
+```{python}
+mask = cv2.imread('data/gm_cut.jpg', 0)
+mask_r = cv2.resize(mask, (irm1_cut.shape[1], irm1_cut.shape[0]))
+And = cv2.bitwise_and(irm1_cut, mask_r)
+plt.hist(And.ravel(), 256, [0, 256]); plt.show()
+gm = And.ravel()
+```
+
+
+```{r}
+library(plotly)
+library(ggplot2)
+ggplotly(
+  ggplot(data.frame(grayLevels = as.numeric(py$gm))) +
+    geom_density(aes(x = grayLevels)) +
+    labs(title = 'gm_cut')
+)
+```
+
+
+```{python}
+mask = cv2.imread('data/csf_cut.jpg', 0)
+mask_r = cv2.resize(mask, (irm1_cut.shape[1], irm1_cut.shape[0]))
+And = cv2.bitwise_and(irm1_cut, mask_r)
+plt.hist(And.ravel(), 256, [0, 256]); plt.show()
+csf = And.ravel()
+```
+
+
+
+
+```{r}
+library(plotly)
+library(ggplot2)
+ggplotly(
+  ggplot(data.frame(grayLevels = as.numeric(py$csf))) +
+    geom_density(aes(x = grayLevels)) +
+    labs(title = 'csf_cut')
+)
+```
+
+
+
+Affichez dans un même graphique l’histogramme global de l’image ainsi que les histogrammes de chaque région d’intérêt.
+
+```{r}
+x   = as.numeric(py$x)
+wm  = as.numeric(py$wm)
+gm  = as.numeric(py$gm)
+csf = as.numeric(py$csf)
+
+
+data = data.frame(
+  x    = c(x, wm, gm, csf),
+  mask = c(rep('IRM',length(x)),
+          rep('White Matter',length(wm)),
+          rep('Gray Matter',length(gm)),
+          rep('Cerebrospinal fluid',length(csf))
+          )
+)
+ggplotly(
+  ggplot(data) +
+    geom_density(aes(x = x, fill = factor(mask), alpha = 0.5)) +
+    facet_grid(mask~.) +
+    xlim(1, 256)
+)
+
+ggplotly(
+  ggplot(data) +
+    geom_density(aes(x = x, fill = factor(mask), alpha = 0.5))
+)
+```
+

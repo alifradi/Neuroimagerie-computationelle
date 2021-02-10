@@ -1,0 +1,75 @@
+---
+title: "01_lecture_affichage_vetudiant"
+author: "Ali Frady"
+date: "1/21/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r set environment, include=FALSE}
+library(reticulate)
+use_condaenv()
+```
+
+Vous disposez de trois images du cerveau en coupes axiales : « irm1_cut.jpg », « irm2_cut.jpg » et « irm3_cut.jpg ». Elles représentent toutes le même cerveau simulé du site BrainWeb.
+
+1) En utilisant la fonction « imread » de Opencv, lisez chacune de ces images. Chaque image est une image en niveaux de gris. Choisissez la bonne option pour qu’elle soit lue correctement.
+
+```{python Question 1}
+import numpy as np
+import cv2
+from matplotlib import pyplot as plt
+
+irm1_cut = cv2.imread('data/irm1_cut.jpg')
+irm2_cut = cv2.imread('data/irm2_cut.jpg')
+irm3_cut = cv2.imread('data/irm3_cut.jpg')
+
+
+l=[irm1_cut, irm2_cut, irm3_cut]
+```
+
+2) Vérifiez que chaque image a été lue correctement en utilisant la fonction « print ». Si l’image n’a pas été lue, la fonction « print » va renvoyer ‘None’.
+
+```{python Question 2}
+for k in l:
+    print(l)
+  # TODO: write code...
+```
+
+3) A l’aide de la fonction « shape », affichez les dimensions de l’image.
+```{python Question 3}
+for k in l: 
+    print(k.shape)
+  # TODO: write code...
+```
+4) Affichez séparément chacune de ces images avec opencv.
+
+```{python Question 4}
+for k in l:
+    plt.imshow(k)
+    plt.show()
+  # TODO: write code...
+  
+# cv2.imshow('irm1_cut', l[0])
+# cv2.imshow('irm2_cut', l[1])
+# cv2.imshow('irm3_cut', l[2])
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
+```
+
+
+5) En utilisant la librairie matplotlib, affichez toutes ces images dans une même fenêtre avec les noms de chaque image (IRM1, IRM2, IRM3)
+
+```{python Question 5}
+plt.subplot(1, 3, 1)
+plt.imshow(irm1_cut),plt.title('IRM1') 
+plt.subplot(1, 3, 2)
+plt.imshow(irm2_cut),plt.title('IRM2') 
+plt.subplot(1, 3, 3)
+plt.imshow(irm3_cut),plt.title('IRM3') 
+plt.show()
+```
+

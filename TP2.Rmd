@@ -1,0 +1,86 @@
+---
+title: "02_modifications_ecriture_vetudiant"
+author: "Ali Frady"
+date: "1/21/2021"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r set environment, include=FALSE}
+library(reticulate)
+use_condaenv()
+```
+
+
+
+Segmentation d'images cérébrales
+
+Ecriture d'images
+Dans cette section, il s’agit d’apprendre à faire des manipulations simples sur des images et de savoir écrire une image avec opencv. Pour cela vous utiliserez les images suivantes : « csf_cut.jpg », « wm_cut.jpg », « gm_cut.jpg ». Chacune de ces images représente des probabilités d’appartenance à chaque tissu cérébral codées entre 0 et 255. Il s’agit dans cette section de transformer chacune de ces images en image binaire.
+
+1) Lisez chacune de ces images avec opencv.
+```{python}
+import numpy as np
+from matplotlib import pyplot as plt
+import cv2
+csf_cut = cv2.imread('data/csf_cut.jpg', 0)
+gm_cut = cv2.imread('data/gm_cut.jpg',   0)
+wm_cut = cv2.imread('data/wm_cut.jpg',   0)
+
+plt.subplot(1, 3, 1)
+plt.imshow(csf_cut),plt.title('csf_cut.jpg') 
+plt.subplot(1, 3, 2)
+plt.imshow(gm_cut),plt.title('gm_cut.jpg') 
+plt.subplot(1, 3, 3)
+plt.imshow(wm_cut),plt.title('wm_cut.jpg') 
+plt.show()
+```
+
+2) Ecrivez une fonction qui s’appelera « binarizing_mask » et qui transforme les niveaux de gris compris entre 0 et 127 en la valeur 0 et les valeurs comprises en 128 et 255 en la valeur 255. Cette fonction doit renvoyer l’image transformée.
+
+```{python}
+# def binarizing_mask(img):
+#     _, th = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+#     return th
+
+
+def binarizing_mask(img):
+  """This function's input is a 2D opencv image which will get binarized."""
+  import numpy as np
+  for i in range(img.shape[0]):
+      for j in range(img.shape[1]):
+          img[i, j] = np.where(img[i, j] <= 127, 0, 255)
+  return img
+
+```
+
+3) Appliquez cette fonction à chacune des images que vous avez lues précédemment et écrivez les images résultats. Les images résultats auront respectivement les noms suivants : « csf_mask.jpg », « gm_mask.jpg », « wm_mask.jpg ».
+
+```{python include=FALSE}
+csf_cut_binarized = binarizing_mask(csf_cut)
+gm_cut_binarized  = binarizing_mask(gm_cut)
+wm_cut_binarized  = binarizing_mask(wm_cut)
+
+#Save images
+
+cv2.imwrite('data/csf_mask.jpg', binarizing_mask(csf_cut))
+cv2.imwrite('data/gm_mask.jpg', binarizing_mask(gm_cut))
+cv2.imwrite('data/wm_mask.jpg', binarizing_mask(wm_cut))
+```
+
+4) En utilisant la librairie matplotlib, affichez les images « irm1_cut.jpg », « csf_mask.jpg », « gm_mask.jpg », « wm_mask.jpg » dans une même fenêtre.
+
+```{python}
+plt.figure(figsize=(12,7))
+plt.subplot(2, 2, 1)
+plt.imshow(cv2.imread('data/irm1_cut.jpg')),plt.title('irm1_cut') 
+plt.subplot(2, 2, 2)
+plt.imshow(cv2.imread('data/csf_mask.jpg')),plt.title('csf_mask') 
+plt.subplot(2, 2, 3)
+plt.imshow(cv2.imread('data/gm_mask.jpg')),plt.title('gm_mask') 
+plt.subplot(2, 2, 4)
+plt.imshow(cv2.imread('data/wm_mask.jpg')),plt.title('wm_mask') 
+plt.show()
+```
