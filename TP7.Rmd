@@ -132,8 +132,74 @@ allLevels2 <- ggplot(data = RMI_Kmeans_segmented2, aes(x = y, y = -x)) +
 
 allLevels2
 ```
+```{r}
+WM <- ggplot(data = RMI_Kmeans_segmented2, aes(x = y, y = -x)) +
+  geom_point(color = factor(RMI_Kmeans_segmented2$clus1))+
+  theme_void() +
+  theme(legend.position = "none") 
+GM <- ggplot(data = RMI_Kmeans_segmented2, aes(x = y, y = -x)) + 
+  geom_point(colour = factor(RMI_Kmeans_segmented2$clus2)) +
+      theme_void() + theme(legend.position="none")
+CSF <- ggplot(data = RMI_Kmeans_segmented2, aes(x = y, y = -x)) + 
+  geom_point(colour = factor(RMI_Kmeans_segmented2$clus3)) +
+      theme_void() + theme(legend.position="none")
+BK <- ggplot(data = RMI_Kmeans_segmented2, aes(x = y, y = -x)) + 
+  geom_point(colour = factor(RMI_Kmeans_segmented2$clus4)) +
+      theme_void() + theme(legend.position="none")
+
+BK
+GM   
+CSF  
+WM
+```
+
+```{r eval=FALSE, include=FALSE}
+jpeg('data/allLevels_noise.jpg')
+allLevels
+dev.off()
+jpeg('data/allLevels_denoised.jpg')
+allLevels2
+dev.off()
+jpeg('data/WhiteMatter_denoised.jpg')
+WM
+dev.off()
+jpeg('data/GrayMatter_denoised.jpg')
+GM
+dev.off()
+jpeg('data/Background_denoised.jpg')
+BK
+dev.off()
+jpeg('data/CSF_denoised.jpg')
+CSF
+dev.off()
+```
+
+
 2) Morphologie mathématique : Appliquez des opérations morphologiques aux masques obtenus par votre méthode de classification afin de se rapprocher des masques initiaux fournis dans l’énoncé et qui représentent la vérité terrain. Calculez de nouveau les performances de votre méthode après les post traitements.
 
-```{r}
 
+```{python}
+wm_mask               = cv2.imread('data/wm_mask.jpg', 0)
+WhiteMatter_denoised  = cv2.imread('data/WhiteMatter_denoised.jpg', 0)
+WhiteMatter_denoised  = cv2.resize(WhiteMatter_denoised, (wm_mask.shape[1],wm_mask.shape[0]))
+GrayMatter_denoised   = cv2.imread('data/GrayMatter_denoised.jpg', 0)
+GrayMatter_denoised   = cv2.resize(GrayMatter_denoised, (wm_mask.shape[1],wm_mask.shape[0]))
+CSF_denoised          = cv2.imread('data/CSF_denoised.jpg', 0)
+CSF_denoised          = cv2.resize(CSF_denoised, (wm_mask.shape[1],wm_mask.shape[0]))
+
+
+kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(5,5))
+dilate = cv2.dilate(WhiteMatter_denoised, kernel, iterations=2)
+erosion = cv2.erode(WhiteMatter_denoised,kernel,iterations = 1)
+
+
+plt.subplot(1, 2, 1)
+plt.imshow(WhiteMatter_denoised),plt.title('WhiteMatter denoised') 
+plt.subplot(1, 2, 2)
+plt.imshow(erosion),plt.title('WhiteMatter denoised and eroded') 
+plt.show()
 ```
+
+
+
+
