@@ -1,5 +1,5 @@
 ---
-title: "05_Segmentation d'images cérébrales"
+title: "06_Segmentation d'images cérébrales"
 author: "Ali FRADY"
 date: "22/01/2021"
 output: html_document

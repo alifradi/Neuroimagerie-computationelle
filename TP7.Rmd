@@ -1,0 +1,34 @@
+---
+title: "07_pistes_amelioration_vetudiant
+"
+author: "Ali Frady"
+date: "2/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r set environment, message=FALSE, warning=FALSE}
+library(reticulate)
+use_condaenv()
+```
+
+
+Pistes d'amélioration
+On se propose dans cette section d’améliorer les performances des méthodes de segmentation testées précédemment en appliquant des prétraitements et des post-traitements.
+
+1) Filtrage : Evaluez les performances de votre méthode de classification sur l’image « irm3_cut.jpg ». Appliquez un filtre (median, moyenneur ou gaussien) qui permet de corriger le bruit dans l’image puis évaluez de nouveau les performances de votre méthode de classification sur cette nouvelle image. Que remarquez-vous ?
+
+```{r}
+
+```
+
+
+
+2) Morphologie mathématique : Appliquez des opérations morphologiques aux masques obtenus par votre méthode de classification afin de se rapprocher des masques initiaux fournis dans l’énoncé et qui représentent la vérité terrain. Calculez de nouveau les performances de votre méthode après les post traitements.
+
+```{r}
+
+```
